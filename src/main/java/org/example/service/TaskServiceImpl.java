@@ -1,6 +1,5 @@
 package org.example.service;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.example.dao.TaskDAO;
 import org.example.domain.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class TaskServiceImpl implements TaskService{
+public class TaskServiceImpl implements TaskService {
 
     private final TaskDAO taskDAO;
 
@@ -38,9 +37,9 @@ public class TaskServiceImpl implements TaskService{
         //получаем колличество тасков
         int taskCount = Math.toIntExact(taskDAO.getTaskCount());
         //получаем количество страниц
-        long pageCount = taskCount/size;
+        long pageCount = taskCount / size;
         //увеличиваем количество страниц на 1, если остаток от деление больше 0
-        if(taskCount%size != 0){
+        if (taskCount % size != 0) {
             pageCount++;
         }
         //создаем список номеров страниц
