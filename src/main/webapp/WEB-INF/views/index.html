@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tasks</title>
+</head>
+<body>
+<table th:border="1" style="border-collapse:collapse">
+    <tr>
+        <th th:width="15">ID</th>
+        <th th:width="200">Описание</th>
+        <th>Статус</th>
+    </tr>
+    <tr th:each="task : ${taskList}">
+        <td th:text="${task.id}">1</td>
+        <td th:text="${task.description}">Task description</td>
+        <td th:text="${task.status}">Incomplete</td>
+        <td>
+            <form th:method="GET" th:action="@{/{id}/edit(id=${task.id})}"><input type="submit" value="Изменить"></form>
+        </td>
+        <td>
+            <form th:method="DELETE" th:action="@{/{id}(page=${currentPageNumber}, id=${task.id})}"><input type="submit" value="Удалить"></form>
+        </td>
+    </tr>
+</table>
+<p>Добавить новую задачу:</p>
+<form th:method="POST" th:action="@{/}" th:object="${newTask}">
+    <table th:border="1" style="border-collapse:collapse">
+        <tr>
+            <th th:width="15">-</th>
+            <th th:width="200"><input type="text" th:field="*{description}" id="description"/></th>
+            <th>
+                <select th:field="*{status}"/>
+                <option th:each="status : ${statuses}"
+                        th:value="${status}" th:text="${status}"></option>
+            </th>
+            <th>
+                <input type="submit" value="Создать!"/>
+            </th>
+        </tr>
+
+    </table>
+</form>
+<!--<form th:method="POST" th:action="@{/}" th:object="${newTask}">-->
+<!--    <div>-->
+<!--        <label for="description">Описание: </label>-->
+<!--        <input type="text" th:field="*{description}" id="description"/>-->
+<!--        <label for="status">Статус: </label>-->
+<!--        <input type="text" th:field="*{status}" id="status"/>-->
+<!--        <br>-->
+<!--        <input type="submit" value="Создать!"/>-->
+<!--    </div>-->
+<!--</form>-->
+
+<hr>
+<table th:border="1" style="border-collapse:collapse">
+    <tr>
+        <td th:each="pageNumber : ${pageNumberList}" th:width="20" th:height="20">
+            <a th:href="@{/(page=${pageNumber},size=10)}"
+               th:text="${pageNumber}">page</a>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
