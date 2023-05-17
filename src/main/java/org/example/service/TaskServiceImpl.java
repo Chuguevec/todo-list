@@ -2,12 +2,14 @@ package org.example.service;
 
 import org.example.dao.TaskDAO;
 import org.example.domain.Task;
+import org.example.dto.TaskDTO;
+import org.example.util.DtoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -21,54 +23,52 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(readOnly = true)
-    public Task getOne(int id) {
-        return taskDAO.findOne(id).get();
+    public TaskDTO getById(int id) {
+        Task task = taskDAO.getById(id).get();
+        return DtoUtil.taskToTaskDTO(task);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Task> getAll(Integer page, Integer size) {
-        return taskDAO.findAll(page, size);
+    public List<TaskDTO> getAll(Integer page, Integer size) {
+        List<Task> tasks = taskDAO.getAll(page, size);
+        return tasks.stream().map(DtoUtil::taskToTaskDTO).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Integer> getPageNumberList(int size) {
+    public Integer getCountPageBySize(int size) {
         //получаем колличество тасков
         int taskCount = Math.toIntExact(taskDAO.getTaskCount());
         //получаем количество страниц
-        long pageCount = taskCount / size;
+        int pageCount = taskCount / size;
         //увеличиваем количество страниц на 1, если остаток от деление больше 0
         if (taskCount % size != 0) {
             pageCount++;
         }
-        //создаем список номеров страниц
-        List<Integer> pagesCount = new ArrayList<>();
-        for (int i = 1; i <= pageCount; i++) {
-            pagesCount.add(i);
-        }
-        return pagesCount;
+        return pageCount;
     }
 
     @Override
     @Transactional
-    public void create(Task task) {
+    public void create(TaskDTO taskDTO) {
+        Task task = DtoUtil.TaskDtoToTask(taskDTO);
         taskDAO.create(task);
     }
 
     @Override
     @Transactional
-    public Task update(int id, Task updatedTask) {
-        Task taskToUpdate = taskDAO.findOne(id).get();
-        taskToUpdate.setDescription(updatedTask.getDescription());
-        taskToUpdate.setStatus(updatedTask.getStatus());
+    public Task update(int id, TaskDTO updatedTaskDto) {
+        Task taskToUpdate = taskDAO.getById(id).get();
+        taskToUpdate.setDescription(updatedTaskDto.getDescription());
+        taskToUpdate.setStatus(updatedTaskDto.getStatus());
         return taskDAO.update(taskToUpdate).get(); //Излишнее действие
     }
 
     @Override
     @Transactional
     public void delete(int id) {
-        Task task = taskDAO.findOne(id).get();
+        Task task = taskDAO.getById(id).get();
         taskDAO.delete(task);
     }
 }

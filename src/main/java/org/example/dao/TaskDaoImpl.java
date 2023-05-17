@@ -1,8 +1,8 @@
 package org.example.dao;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.example.domain.Task;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,20 +10,18 @@ import java.util.Optional;
 
 @Repository
 public class TaskDaoImpl implements TaskDAO {
-    private final SessionFactory sessionFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    public TaskDaoImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+
+    @Override
+    public Optional<Task> getById(int id) {
+        return Optional.ofNullable(entityManager.find(Task.class, id));
     }
 
     @Override
-    public Optional<Task> findOne(int id) {
-        return Optional.ofNullable(getSession().find(Task.class, id));
-    }
-
-    @Override
-    public List<Task> findAll(int page, int size) {
-        return getSession().createQuery("SELECT t from Task t order by t.id", Task.class)
+    public List<Task> getAll(int page, int size) {
+        return entityManager.createQuery("from Task", Task.class)
                 .setMaxResults(size)
                 .setFirstResult(page * size - size)
                 .getResultList();
@@ -31,25 +29,22 @@ public class TaskDaoImpl implements TaskDAO {
 
     @Override
     public Long getTaskCount() {
-        return getSession().createQuery("SELECT COUNT(t) FROM Task t", Long.class).getSingleResult();
+        return entityManager.createQuery("SELECT COUNT(t) FROM Task t", Long.class).getSingleResult();
     }
 
     @Override
     public void create(Task task) {
-        getSession().persist(task);
+        entityManager.persist(task);
     }
 
     @Override
     public Optional<Task> update(Task task) {
-        return Optional.ofNullable(getSession().merge(task));
+        return Optional.ofNullable(entityManager.merge(task));
     }
 
     @Override
     public void delete(Task task) {
-        getSession().remove(task);
+        entityManager.remove(task);
     }
 
-    private Session getSession() {
-        return sessionFactory.getCurrentSession();
-    }
 }

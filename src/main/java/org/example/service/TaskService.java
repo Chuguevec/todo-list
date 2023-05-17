@@ -1,19 +1,20 @@
 package org.example.service;
 
 import org.example.domain.Task;
+import org.example.dto.TaskDTO;
 
 import java.util.List;
 
 public interface TaskService {
-    Task getOne(int id);
+    TaskDTO getById(int id);
 
-    List<Task> getAll(Integer page, Integer size);
+    List<TaskDTO> getAll(Integer page, Integer size);
 
-    List<Integer> getPageNumberList(int size);
+    Integer getCountPageBySize(int size);
 
-    void create(Task task);
+    void create(TaskDTO taskDTO);
 
-    Task update(int id, Task task);
+    Task update(int id, TaskDTO taskDTO);
 
     void delete(int id);
 }
